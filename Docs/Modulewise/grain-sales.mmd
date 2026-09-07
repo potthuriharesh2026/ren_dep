@@ -1,0 +1,16 @@
+flowchart TB
+    %% Purpose: farmer grain-sale submission, review and payment lifecycle.
+    F["Farmer"] --> SUB["POST /api/farmer/grain-sales"] --> FS["farmer_service.submit_grain_sale"]
+    FS --> C[("crops")]
+    FS --> GS[("grain_sales")]
+    F --> LIST["GET /api/farmer/grain-sales"] --> FS --> GS
+    M["Manager / Admin"] --> ALL["GET /api/manager/grain-sales"] --> MS["manager_service"] --> GS
+    M --> REV["PUT /api/manager/grain-sales/{id}/review"] --> MS
+    REV --> DEC{"Review result"}
+    DEC -->|"approved"| APP["approved"]
+    DEC -->|"rejected"| REJ["rejected"]
+    APP --> GS
+    REJ --> GS
+    M --> PAY["PUT /api/manager/grain-sales/{id}/pay"] --> MS
+    PAY --> TX[("transactions")]
+    PAY --> PAID["paid"] --> GS

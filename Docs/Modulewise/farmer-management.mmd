@@ -1,0 +1,17 @@
+flowchart TB
+    %% Purpose: farmer registration/profile lifecycle, approval and administration.
+    F["Farmer"] --> REG["POST /api/auth/register"] --> AS["auth_service.register_farmer"]
+    AS --> U[("users")]
+    AS --> FP[("farmer_profiles")]
+
+    F --> PR["GET/PUT /api/farmer/profile"] --> FS["farmer_service"]
+    FS --> U
+    FS --> FP
+
+    M["Manager / Admin"] --> AP["POST /api/manager/farmers/{id}/approve"]
+    AP --> MS["manager_service.approve_farmer"] --> U
+
+    A["Admin / Manager"] --> LIST["GET /api/admin/farmers"] --> ADM["admin_service"] --> U
+    A --> DETAIL["GET /api/admin/farmers/{id}"] --> ADM
+    SA["Admin / Super Admin"] --> DEL["DELETE /api/admin/farmers/{id}"] --> ADM
+    ADM --> FP

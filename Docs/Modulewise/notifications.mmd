@@ -1,0 +1,9 @@
+flowchart TB
+    %% Purpose: database-backed in-app notifications and read-state management.
+    U["Authenticated User"] --> L["GET /api/notifications/"] --> NR["Notifications Router"]
+    U --> RA["PUT /api/notifications/read-all"] --> NR
+    U --> R1["PUT /api/notifications/{id}/read"] --> NR
+    NR --> DB["Async SQLAlchemy"] --> N[("notifications")]
+    N --> DATA["title / message / type / read state / reference type & id"]
+    F["Farmer"] --> FL["Farmer notification endpoints"] --> FS["farmer_service"] --> N
+    V["Farm Visit Notification Trigger"] --> MS["manager_service"] --> N

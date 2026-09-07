@@ -1,0 +1,9 @@
+flowchart TB
+    %% Purpose: public market-rate reading and admin market-rate maintenance.
+    P["Public / Any Client"] --> GET["GET /api/market/"] --> R["Market Router Direct DB Logic"]
+    A["Admin"] --> POST["POST /api/market/"] --> R
+    A --> PUT["PUT /api/market/{id}"] --> R
+    A --> DEL["DELETE /api/market/{id}"] --> R
+    R --> DB["Async SQLAlchemy"] --> MR[("market_rates")]
+    MR --> DATA["crop type / grade / price per kg / effective date / set_by"]
+    F["Farmer service"] -. "reads rates for farmer experience" .-> MR

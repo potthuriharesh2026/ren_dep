@@ -1,0 +1,11 @@
+flowchart TB
+    %% Purpose: financial ledger for seed purchases, grain payments and administrative transactions.
+    U["Admin / Farmer"] --> GET["GET /api/ledger/"] --> LR["Ledger Router"]
+    A["Admin"] --> C["POST /api/ledger/"] --> LR
+    A --> UTX["PUT /api/ledger/{id}"] --> LR
+    A --> P["PUT /api/ledger/{id}/process"] --> LR
+    LR --> DB["Async SQLAlchemy"] --> TX[("transactions")]
+    TX --> META["reference type/id | farmer | amount | direction | status | UPI | transaction/invoice"]
+    SP[("seed_purchases")] -. "financial reference" .-> TX
+    GS[("grain_sales")] -. "payment reference" .-> TX
+    F["Farmer"] --> FTX["GET /api/farmer/transactions"] --> FS["farmer_service"] --> TX

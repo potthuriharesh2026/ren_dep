@@ -1,0 +1,13 @@
+flowchart TB
+    %% Purpose: manager scheduling, execution and farmer visibility of farm visits.
+    M["Manager / Admin"] --> LIST["GET /api/manager/visits"] --> MS["manager_service"]
+    M --> CREATE["POST /api/manager/visits"] --> MS
+    M --> UPDATE["PUT /api/manager/visits/{id}"] --> MS
+    M --> NOTIFY["POST /api/manager/visits/notifications"] --> MS
+    MS --> FV[("farm_visits")]
+    FV --> C[("crops")]
+    FV --> F[("farmer user")]
+    NOTIFY --> N[("notifications")]
+    FR["Farmer"] --> VIEW["GET /api/farmer/visits"] --> FS["farmer_service.get_visits"] --> FV
+    CREATE --> S["scheduled"]
+    UPDATE --> DONE["completed / actual date / acreage / report"]

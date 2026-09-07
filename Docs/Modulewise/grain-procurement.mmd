@@ -1,0 +1,16 @@
+flowchart TB
+    %% Purpose: manager procurement from booking or direct grain-sale workflows.
+    M["Manager / Admin"] --> PB["POST /api/manager/bookings/procure"]
+    PB --> MS["manager_service.procure_grain_booking"]
+    MS --> BS[("booking_slots")]
+    MS --> W[("warehouses")]
+    MS --> WI[("warehouse_inventory")]
+    BS --> QC["grain quality / received quantity / remarks"]
+    QC --> PROC["procurement_status = received/completed"]
+    PROC --> WI
+
+    M --> PG["POST /api/manager/grain-sales/procure"]
+    PG --> MC["manager_service.procure_crop"]
+    MC --> GS[("grain_sales")]
+    MC --> WI
+    WI --> LOAD["Update warehouse inventory/load"]

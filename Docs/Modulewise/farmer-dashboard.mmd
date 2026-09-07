@@ -1,0 +1,12 @@
+flowchart TB
+    %% Purpose: farmer dashboard summary across the farmer's operational data.
+    F["Farmer"] --> R["GET /api/farmer/dashboard"] --> RBAC["farmer role"]
+    RBAC --> S["farmer_service.get_dashboard"] --> DB["Async SQLAlchemy"]
+    DB --> C[("crops")]
+    DB --> SP[("seed_purchases")]
+    DB --> GS[("grain_sales")]
+    DB --> BS[("booking_slots")]
+    DB --> TX[("transactions")]
+    DB --> FV[("farm_visits")]
+    DB --> N[("notifications")]
+    C & SP & GS & BS & TX & FV & N --> SUM["Farmer-specific summary"] --> RESP["Dashboard JSON"]

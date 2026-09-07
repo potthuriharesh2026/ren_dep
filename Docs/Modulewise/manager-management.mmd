@@ -1,0 +1,12 @@
+flowchart TB
+    %% Purpose: admin-controlled manager account lifecycle.
+    A["Admin"] --> L["GET /api/admin/managers"]
+    A --> C["POST /api/admin/managers"]
+    A --> U["PUT /api/admin/managers/{id}"]
+    A --> ST["PUT /api/admin/managers/{id}/status"]
+    L & C & U & ST --> S["admin_service.py"]
+    S --> DB["Async SQLAlchemy"]
+    DB --> USERS[("users")]
+    DB --> MGR[("managers")]
+    C --> PW["Hash initial password"] --> USERS
+    ST --> STATUS["Activate / deactivate manager"] --> USERS
