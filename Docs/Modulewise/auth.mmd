@@ -1,0 +1,26 @@
+flowchart TB
+    %% Purpose: login, farmer registration, profile/password operations and token-based authentication.
+    C["Next.js Client"] --> R["/api/auth Router"]
+    R --> V["Auth Pydantic Schemas"]
+    V --> S["auth_service.py"]
+    S --> DB["Async SQLAlchemy"]
+    DB --> U[("users / profiles / farmer_profiles")]
+
+    R --> L["POST /login"]
+    L --> A["Authenticate email/phone + password"]
+    A --> T["Create AgriFlow JWT"]
+    T --> C
+
+    R --> REG["POST /register"]
+    REG --> RF["Register Farmer"]
+    RF --> U
+
+    R --> P["PUT /profile\nPUT /change-password"]
+    P --> CU["get_current_user"]
+    CU --> J["Bearer JWT validation"]
+    J -. "compatibility fallback" .-> SJ["Supabase JWT"]
+    J --> U
+    SJ --> U
+
+    R --> FP["POST /forgot-password\nPOST /resolve-phone\nGET /user-data"]
+    FP --> S
