@@ -1,0 +1,11 @@
+flowchart TB
+    %% Purpose: controlled farmer bank-detail change workflow.
+    F["Farmer"] --> REQ["POST /api/farmer/bank-change"] --> FS["farmer_service.request_bank_change"]
+    FS --> B[("bank_change_requests")]
+    B --> P["Status: pending"]
+    M["Manager / Admin"] --> LIST["GET /api/manager/bank-requests"] --> MS["manager_service"] --> B
+    A["Admin"] --> REVIEW["PUT /api/manager/bank-requests/{id}"] --> MS
+    REVIEW --> DEC{"Approve or Reject"}
+    DEC -- "Approved" --> FP[("farmer_profiles")]
+    DEC -- "Rejected" --> B
+    FP --> B

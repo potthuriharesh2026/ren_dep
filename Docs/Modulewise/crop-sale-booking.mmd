@@ -1,0 +1,19 @@
+flowchart TB
+    %% Purpose: farmer delivery/crop-sale slot booking and manager booking lifecycle management.
+    F["Farmer"] --> AV["GET warehouse slots"] --> WS[("warehouse_slots")]
+    F --> BOOK["POST /api/farmer/bookings"] --> FS["farmer_service.book_delivery_slot"]
+    FS --> GS[("grain_sales")]
+    FS --> W[("warehouses")]
+    FS --> WS
+    FS --> BS[("booking_slots")]
+    WS --> CAP{"Capacity available?"}
+    CAP -- "No" --> ERR["Reject booking"]
+    CAP -- "Yes" --> BS
+    BS --> P["pending / booking details"]
+    F --> MY["GET /api/farmer/bookings"] --> FS --> BS
+
+    M["Manager / Admin"] --> ML["GET /api/manager/bookings"] --> MS["manager_service"] --> BS
+    M --> ST["PUT /api/manager/bookings/{id}/status"] --> MS
+    M --> Y["PUT /api/manager/bookings/{id}/yield"] --> MS
+    ST --> BS
+    Y --> BS

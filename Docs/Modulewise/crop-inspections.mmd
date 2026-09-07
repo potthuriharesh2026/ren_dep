@@ -1,0 +1,10 @@
+flowchart TB
+    %% Purpose: inspection of booked crop/grain quantities before procurement.
+    M["Manager / Admin"] --> EP["POST /api/manager/bookings/{slot_id}/inspect"]
+    EP --> MS["manager_service.inspect_crop"]
+    MS --> B[("booking_slots")]
+    MS --> G[("grain_sales")]
+    MS --> I[("crop_inspections")]
+    I --> Q["good quantity / bad quantity / rejection reason / notes"]
+    Q --> B
+    I --> INSPECTOR[("users - inspector_id")]

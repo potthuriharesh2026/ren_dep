@@ -1,0 +1,11 @@
+flowchart TB
+    %% Purpose: farmer crop registration and crop monitoring access.
+    F["Farmer"] --> R1["POST /api/farmer/crops"] --> FS["farmer_service.register_crop"]
+    F --> R2["GET /api/farmer/crops"] --> FS
+    F --> R3["POST /api/crops/"] --> CR["Crops Router Direct Logic"]
+    AU["Authenticated User"] --> R4["GET /api/crops/"] --> CR
+    M["Manager / Admin"] --> R5["GET /api/manager/crops/active"] --> MS["manager_service.get_active_crops"]
+    FS & CR & MS --> DB["Async SQLAlchemy"] --> C[("crops")]
+    C --> STATES["Crop status / sowing / harvest / acreage / current month"]
+    C --> FV[("farm_visits")]
+    C --> GS[("grain_sales")]

@@ -1,0 +1,7 @@
+flowchart TB
+    %% Purpose: administrative visibility of persisted audit records.
+    A["Admin"] --> EP["GET /api/admin/audit-logs"] --> AS["admin_service.get_audit_logs"]
+    AS --> DB["Async SQLAlchemy"] --> AL[("audit_logs")]
+    AL --> DATA["user_id / action / entity_type / entity_id / details / IP / created_at"]
+    DATA --> RESP["Paginated/ordered audit response"]
+    OPS["Auditable application operations"] -. "where audit rows are written" .-> AL

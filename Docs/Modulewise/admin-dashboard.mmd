@@ -1,0 +1,13 @@
+flowchart TB
+    %% Purpose: admin/manager dashboard analytics from operational tables.
+    A["Admin / Manager"] --> R["GET /api/admin/dashboard"]
+    R --> RBAC["Role Check"] --> S["admin_service.get_dashboard"]
+    S --> DB["Async SQLAlchemy Queries"]
+    DB --> F[("users / farmer_profiles")]
+    DB --> C[("crops")]
+    DB --> SP[("seed_purchases")]
+    DB --> GS[("grain_sales")]
+    DB --> TX[("transactions")]
+    DB --> W[("warehouses")]
+    F & C & SP & GS & TX & W --> AGG["Aggregate dashboard metrics"]
+    AGG --> RESP["JSON Dashboard Response"]
