@@ -1,0 +1,7 @@
+flowchart TB
+    %% Purpose: protected upload API placeholder. Current code does not implement full persistent file storage.
+    U["Admin / Farmer"] --> EP["POST /api/storage/upload"] --> RBAC["Role Check"]
+    RBAC --> R["Storage Router"]
+    R --> P["Current placeholder upload logic"]
+    P -. "intended future integration" .-> SS["Supabase Storage / Local Storage"]
+    P --> RESP["Upload response"]

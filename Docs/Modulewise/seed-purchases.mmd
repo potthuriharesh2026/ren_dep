@@ -1,0 +1,13 @@
+flowchart TB
+    %% Purpose: farmer seed ordering and operational purchase status handling.
+    F["Farmer"] --> BUY["POST /api/farmer/seeds/purchase"] --> FS["farmer_service.purchase_seeds"]
+    FS --> SEED[("seeds")]
+    FS --> SP[("seed_purchases")]
+    FS --> TX[("transactions")]
+    SEED --> HOLD["Validate stock and update stock/on-hold quantities"]
+    HOLD --> SP
+    F --> LIST["GET /api/farmer/seed-purchases"] --> FS --> SP
+
+    A["Admin / Manager"] --> ALL["GET /api/admin/seed-purchases"] --> AS["admin_service"] --> SP
+    A --> ST["PUT /api/admin/seed-purchases/{id}/status"] --> AS
+    ST --> STATUS["Update purchase/payment/pickup status"] --> SP

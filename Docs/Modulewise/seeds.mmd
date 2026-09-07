@@ -1,0 +1,10 @@
+flowchart TB
+    %% Purpose: seed catalogue and stock administration.
+    P["Public User"] --> PUB["GET /api/public/seeds"] --> SDB[("seeds")]
+    F["Farmer"] --> FL["GET /api/farmer/seeds"] --> FS["farmer_service.get_seeds"] --> SDB
+    A["Admin / Manager"] --> AL["GET /api/admin/seeds"] --> AS["admin_service"] --> SDB
+    AA["Admin"] --> C["POST /api/admin/seeds"] --> AS
+    A --> U["PUT /api/admin/seeds/{id}"] --> AS
+    AA --> D["DELETE /api/admin/seeds/{id}"] --> AS
+    AS --> SW[("seed_warehouses")]
+    SDB --> STOCK["price / stock / on-hold / active / image / warehouse"]

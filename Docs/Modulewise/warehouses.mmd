@@ -1,0 +1,17 @@
+flowchart TB
+    %% Purpose: warehouse master data, capacity, inventory and delivery-slot capacity.
+    A["Admin / Manager"] --> L["GET /api/warehouse/"] --> WR["Warehouse Router"]
+    AA["Admin"] --> C["POST /api/warehouse/"] --> WR
+    AA --> INV["POST /api/warehouse/{id}/inventory"] --> WR
+    A --> SLOTS["GET /api/warehouse/{id}/slots"] --> WR
+    A --> ALLS["GET /api/warehouse/slots/list"] --> WR
+    A --> CS["POST /api/warehouse/slots"] --> WR
+    A --> US["PUT /api/warehouse/slots/{id}"] --> WR
+    WR --> DB["Async SQLAlchemy"]
+    DB --> W[("warehouses")]
+    DB --> WI[("warehouse_inventory")]
+    DB --> WS[("warehouse_slots")]
+    W --> CAP["total capacity / current load / active"]
+    WS --> BOOK["slot date/time / total vs booked capacity / status"]
+    F["Farmer"] --> FVIEW["GET /api/farmer/warehouses\nGET /api/farmer/warehouses/{id}/slots"] --> FS["farmer_service"] --> W
+    FS --> WS

@@ -1,0 +1,11 @@
+flowchart TB
+    %% Purpose: monthly operational reporting exposed to admin roles.
+    A["Admin"] --> EP["GET /api/admin/reports/monthly"] --> AS["admin_service.get_reports_monthly"]
+    AS --> DB["Async SQLAlchemy Aggregations"]
+    DB --> F[("farmers/users")]
+    DB --> C[("crops")]
+    DB --> SP[("seed_purchases")]
+    DB --> GS[("grain_sales")]
+    DB --> TX[("transactions")]
+    DB --> W[("warehouses")]
+    F & C & SP & GS & TX & W --> REPORT["Monthly Report Dataset"] --> JSON["JSON Response"]

@@ -1,0 +1,21 @@
+flowchart TB
+    %% Purpose: identity model and role-based access control shared by all protected modules.
+    REQ["Protected API Request"] --> B["HTTP Bearer Credentials"] --> GCU["get_current_user()"]
+    GCU --> JWT["Decode AgriFlow JWT"]
+    JWT -. "if unresolved" .-> SUPA["Validate Supabase Token"]
+    JWT --> USER[("users")]
+    SUPA --> USER
+    USER --> ACTIVE{"User active?"}
+    ACTIVE -- "No" --> DENY["401/403"]
+    ACTIVE -- "Yes" --> ROLE["require_role(allowed_roles)"]
+    ROLE --> CHECK{"Role allowed?"}
+    CHECK -- "No" --> DENY
+    CHECK -- "Yes" --> ROUTE["Execute Router Operation"]
+
+    USER --> PROFILE[("profiles")]
+    USER --> FARMER[("farmer_profiles")]
+    USER --> MANAGER[("managers")]
+    ROLE --> R1["farmer"]
+    ROLE --> R2["manager"]
+    ROLE --> R3["admin"]
+    

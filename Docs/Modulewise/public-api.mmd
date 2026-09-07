@@ -1,0 +1,11 @@
+flowchart TB
+    %% Purpose: unauthenticated data used by public-facing pages.
+    P["Public User / Landing Page"] --> S["GET /api/public/stats"] --> R["Public Router"]
+    P --> SD["GET /api/public/seeds"] --> R
+    R --> DB["Async SQLAlchemy"]
+    DB --> U[("users / farmer data")]
+    DB --> C[("crops")]
+    DB --> SE[("seeds")]
+    U & C --> STATS["Public aggregate statistics"]
+    SE --> CAT["Active/public seed catalogue"]
+    STATS & CAT --> RESP["Public JSON Response"]
