@@ -3,10 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 import httpx
 
-from app.auth import create_token, hash_password, verify_password
+from app.core.security import create_token, hash_password, verify_password
 from app.models.user import User, Profile, FarmerProfile
 from app.schemas.auth import RegisterRequest, LoginRequest
-from app.config import settings
+from app.core.config import settings
 
 
 async def authenticate_user(db: AsyncSession, data: LoginRequest) -> tuple[User, str]:

@@ -4,7 +4,12 @@ from pydantic import ConfigDict, field_validator
 
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = "development"
     DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/postgres"
+    DB_POOL_SIZE: int = 20
+    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_TIMEOUT: int = 30
+    DB_POOL_RECYCLE: int = 1800
     JWT_SECRET_KEY: str = "your-secret-key-change-this"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_MINUTES: int = 1440

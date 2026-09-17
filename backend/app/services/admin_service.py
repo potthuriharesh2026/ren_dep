@@ -4,7 +4,7 @@ from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.auth import hash_password
+from app.core.security import hash_password
 from app.models.user import User, Profile, FarmerProfile, Manager
 from app.models.crop import Crop
 from app.models.transaction import Transaction

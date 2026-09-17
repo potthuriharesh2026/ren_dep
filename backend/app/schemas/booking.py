@@ -35,12 +35,12 @@ class BookingSlotResponse(BaseModel):
 
 
 class CreateBookingRequest(BaseModel):
-    farmer_id: int
-    booking_date: str
+    farmer_id: int | None = None
+    booking_date: str | None = None
     delivery_address: str = "TBD"
-    grain_type: str
+    grain_type: str | None = None
     warehouse_id: int | None = None
-    quantity_kg: float
+    quantity_kg: float = 0.0
     warehouse_slot_id: int | None = None
 
 

@@ -1,14 +1,20 @@
 """
 Seed script to create default test users for all roles in AgriFlow.
-Run with:
-    python seed_test_users.py
+Run from backend directory with:
+    python scripts/seed_test_users.py
 """
 import asyncio
+import os
+import sys
 import uuid
+
+# Ensure backend root is in sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from sqlalchemy import select
-from app.database import async_session_factory
+from app.core.database import async_session_factory
 from app.models.user import User, FarmerProfile, Manager
-from app.auth import hash_password
+from app.core.security import hash_password
 
 
 TEST_USERS = [

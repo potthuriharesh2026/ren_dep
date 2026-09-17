@@ -29,9 +29,13 @@ class GrainSaleResponse(BaseModel):
 
 
 class SubmitGrainSaleRequest(BaseModel):
-    farmer_id: int
-    grain_type: str
-    quantity_kg: float
+    farmer_id: int | None = None
+    grain_type: str | None = None
+    crop_type: str | None = None
+    grain_name: str | None = None
+    quantity_kg: float | None = None
+    quantity: float | None = None
+    raw_material_kg: float | None = None
     warehouse_id: int | None = None
 
 

@@ -1,13 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth import require_role
-from app.database import get_db
+from app.api.deps import get_db, require_role
 from app.models.user import User
 from app.schemas.user import CreateManagerRequest, UpdateManagerRequest, UpdateManagerStatusRequest
 from app.services import admin_service
 
-router = APIRouter(prefix="/api/admin", tags=["admin"])
+router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 @router.get("/dashboard")
@@ -80,28 +79,31 @@ async def get_reports_monthly(month: str | None = None, user: User = Depends(req
     return await admin_service.get_reports_monthly(db, month)
 
 
+from app.schemas.seed import CreateSeedRequest, UpdateSeedRequest, UpdateSeedPurchaseStatusRequest
+
+
 @router.get("/seeds")
 async def get_seeds(user: User = Depends(require_role(["admin", "super_admin", "manager"])), db: AsyncSession = Depends(get_db)):
     return await admin_service.get_seeds(db)
 
 
 @router.post("/seeds")
-async def create_seed(data: dict, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
+async def create_seed(data: CreateSeedRequest, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
     seed_id = await admin_service.create_seed(
-        db, data.get("name"), data.get("variety"), data.get("price_per_kg", 0),
-        data.get("stock_kg", 0), data.get("description"), data.get("image_url"),
-        data.get("is_active", True), data.get("warehouse_ids"),
+        db, data.name, data.variety, data.price_per_kg or 0,
+        data.stock_kg or 0, data.description, data.image_url,
+        data.is_active, data.warehouse_ids,
     )
     return {"id": seed_id, "message": "Seed created"}
 
 
 @router.put("/seeds/{seed_id}")
-async def update_seed(seed_id: int, data: dict, user: User = Depends(require_role(["admin", "super_admin", "manager"])), db: AsyncSession = Depends(get_db)):
+async def update_seed(seed_id: int, data: UpdateSeedRequest, user: User = Depends(require_role(["admin", "super_admin", "manager"])), db: AsyncSession = Depends(get_db)):
     try:
         await admin_service.update_seed(
-            db, seed_id, data.get("name"), data.get("variety"), data.get("price_per_kg"),
-            data.get("stock_kg"), data.get("description"), data.get("image_url"),
-            data.get("is_active"), data.get("warehouse_ids"), user.role,
+            db, seed_id, data.name, data.variety, data.price_per_kg,
+            data.stock_kg, data.description, data.image_url,
+            data.is_active, data.warehouse_ids, user.role,
         )
         return {"message": "Seed updated"}
     except ValueError as e:
@@ -123,9 +125,9 @@ async def get_seed_purchases(user: User = Depends(require_role(["admin", "super_
 
 
 @router.put("/seed-purchases/{purchase_id}/status")
-async def update_seed_purchase_status(purchase_id: int, data: dict, user: User = Depends(require_role(["admin", "super_admin", "manager"])), db: AsyncSession = Depends(get_db)):
+async def update_seed_purchase_status(purchase_id: int, data: UpdateSeedPurchaseStatusRequest, user: User = Depends(require_role(["admin", "super_admin", "manager"])), db: AsyncSession = Depends(get_db)):
     try:
-        await admin_service.update_seed_purchase_status(db, purchase_id, data.get("status", "pending"), user.id)
+        await admin_service.update_seed_purchase_status(db, purchase_id, data.status or "pending", user.id)
         return {"message": "Purchase updated"}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

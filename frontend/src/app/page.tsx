@@ -538,10 +538,10 @@ export default function LandingPage() {
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
-                    href="/login?role=farmer"
+                    href="/login"
                     className="w-full py-3 rounded-2xl bg-emerald-900/60 hover:bg-emerald-800 text-white text-xs font-bold transition-all border border-emerald-500/30 text-center"
                   >
-                    View Farmer Portal Demo
+                    View Farmer Portal
                   </Link>
                 </div>
               </div>
@@ -808,7 +808,7 @@ export default function LandingPage() {
                         <div className="text-base font-bold text-emerald-300 font-mono">₹{seed.price_per_kg}/kg</div>
                       </div>
                       <Link
-                        href="/login?role=farmer"
+                        href="/login"
                         className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-all shadow-md"
                       >
                         Order Seed
@@ -845,7 +845,7 @@ export default function LandingPage() {
                   href="/login"
                   className="px-8 py-4 rounded-2xl bg-emerald-800/50 hover:bg-emerald-700/60 text-white font-bold text-sm transition-all border border-emerald-500/30"
                 >
-                  Explore Demo Portals
+                  Access Platform
                 </Link>
               </div>
             </div>
@@ -864,13 +864,13 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-6 text-slate-200 font-medium">
-            <Link href="/login?role=farmer" className="hover:text-emerald-300 transition-colors">Farmer Login</Link>
-            <Link href="/login?role=manager" className="hover:text-emerald-300 transition-colors">Warehouse Manager</Link>
-            <Link href="/login?role=admin" className="hover:text-emerald-300 transition-colors">Admin Dashboard</Link>
+            <Link href="/login" className="hover:text-emerald-300 transition-colors">Farmer Login</Link>
+            <Link href="/login" className="hover:text-emerald-300 transition-colors">Warehouse Manager</Link>
+            <Link href="/login" className="hover:text-emerald-300 transition-colors">Admin Dashboard</Link>
           </div>
 
           <div className="text-slate-400">
-            © {new Date().getFullYear()} AgriFlow. Digital Agricultural Logistics & Procurement.
+            © {new Date().getFullYear()} AgriFlow Technologies. All rights reserved. Digital Agricultural Logistics & Procurement.
           </div>
         </div>
       </footer>

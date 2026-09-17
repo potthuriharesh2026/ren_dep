@@ -20,9 +20,15 @@ class CropResponse(BaseModel):
 
 
 class RegisterCropRequest(BaseModel):
-    crop_type: str
-    acres: float
-    sowing_date: str
+    crop_type: str | None = None
+    crop_name: str | None = None
+    acres: float | None = None
+    acreage: float | None = None
+    sowing_date: str | None = None
+    planting_date: str | None = None
+    harvest_date: str | None = None
+    expected_harvest_date: str | None = None
+    seed_name: str | None = None
     notes: str | None = None
 
 

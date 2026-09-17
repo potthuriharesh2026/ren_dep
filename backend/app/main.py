@@ -1,47 +1,18 @@
-import json
-from datetime import datetime, date, time
-from decimal import Decimal
-from uuid import UUID
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
-from app.config import settings
-from app.routers import (
-    auth, admin, farmer, manager, public,
-    crops, market, warehouse, ledger, notifications, storage,
-)
-
-
-class CustomJSONEncoder(json.JSONEncoder):
-    """JSON encoder that handles datetime, date, time, uuid, and Decimal objects."""
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        if isinstance(obj, date):
-            return obj.isoformat()
-        if isinstance(obj, time):
-            return obj.isoformat()
-        if isinstance(obj, Decimal):
-            return float(obj)
-        if isinstance(obj, UUID):
-            return str(obj)
-        return super().default(obj)
-
-
-class CustomJSONResponse(JSONResponse):
-    def render(self, content) -> bytes:
-        return json.dumps(content, cls=CustomJSONEncoder, ensure_ascii=False).encode("utf-8")
-
+from app.api.v1.api import api_router
+from app.core.config import settings
+from app.core.database import async_session_factory
+from app.utils.json_encoder import CustomJSONResponse
 
 app = FastAPI(
     title="AgriFlow Backend API",
-    description="FastAPI backend replacing Supabase Edge Functions",
+    description="Enterprise AgriFlow FastAPI Backend",
     version="1.0.0",
     default_response_class=CustomJSONResponse,
 )
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,17 +22,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
-app.include_router(admin.router)
-app.include_router(farmer.router)
-app.include_router(manager.router)
-app.include_router(public.router)
-app.include_router(crops.router)
-app.include_router(market.router)
-app.include_router(warehouse.router)
-app.include_router(ledger.router)
-app.include_router(notifications.router)
-app.include_router(storage.router)
+import logging
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+
+logger = logging.getLogger("agriflow")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+
+# Include v1 API router
+app.include_router(api_router)
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled error on {request.method} {request.url}: {str(exc)}", exc_info=True)
+    if settings.ENVIRONMENT == "production":
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": "An internal server error occurred. Please contact support."},
+        )
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": str(exc)},
+    )
 
 
 @app.get("/")
@@ -71,4 +54,15 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    db_status = "unknown"
+    try:
+        async with async_session_factory() as session:
+            await session.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+
+    return {
+        "status": "ok" if db_status == "connected" else "degraded",
+        "database": db_status,
+    }

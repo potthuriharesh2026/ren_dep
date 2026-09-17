@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth import get_current_user, hash_password
-from app.database import get_db
+from app.api.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.auth import (
     LoginRequest, RegisterRequest, ForgotPasswordRequest,
@@ -10,7 +9,7 @@ from app.schemas.auth import (
 )
 from app.services import auth_service
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login")

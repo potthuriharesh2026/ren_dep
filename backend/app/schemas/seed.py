@@ -43,9 +43,13 @@ class UpdateSeedRequest(BaseModel):
 
 
 class PurchaseSeedRequest(BaseModel):
-    farmer_id: int
-    seed_id: int
-    quantity_kg: float
+    farmer_id: int | None = None
+    seed_id: int | None = None
+    seed_name: str | None = None
+    name: str | None = None
+    quantity_kg: float | None = None
+    quantity: float | None = None
+    qty: float | None = None
     payment_method: str | None = None
     upi_id: str | None = None
     transaction_id: str | None = None

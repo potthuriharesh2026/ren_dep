@@ -5,7 +5,7 @@ from typing import Optional
 from sqlalchemy import BigInteger, Date, DateTime, ForeignKey, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database import Base
+from app.core.database import Base
 
 
 class FarmVisit(Base):

@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth import require_role
-from app.database import get_db
+from app.api.deps import get_db, require_role
 from app.models.transaction import Transaction
 from app.models.user import User
 
-router = APIRouter(prefix="/api/ledger", tags=["ledger"])
+from app.schemas.transaction import CreateTransactionRequest, UpdateTransactionRequest
+
+router = APIRouter(prefix="/ledger", tags=["ledger"])
 
 
 @router.get("/")
@@ -20,11 +21,11 @@ async def get_transactions(user: User = Depends(require_role(["admin", "super_ad
 
 
 @router.post("/")
-async def create_transaction(data: dict, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
+async def create_transaction(data: CreateTransactionRequest, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
     tx = Transaction(
-        farmer_id=data.get("farmer_id"), amount=data.get("amount", 0),
-        direction=data.get("direction"), description=data.get("description"),
-        reference_type=data.get("reference_type", "other"), reference_id=data.get("reference_id"),
+        farmer_id=data.farmer_id, amount=data.amount or 0,
+        direction=data.direction, description=data.description,
+        reference_type=data.reference_type or "other", reference_id=data.reference_id,
     )
     db.add(tx)
     await db.flush()
@@ -32,14 +33,14 @@ async def create_transaction(data: dict, user: User = Depends(require_role(["adm
 
 
 @router.put("/{tx_id}")
-async def update_transaction(tx_id: int, data: dict, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
+async def update_transaction(tx_id: int, data: UpdateTransactionRequest, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Transaction).where(Transaction.id == tx_id))
     tx = result.scalar_one_or_none()
     if not tx:
         raise HTTPException(status_code=404, detail="Transaction not found")
-    for key in ("amount", "direction", "status", "description"):
-        if key in data and data[key] is not None:
-            setattr(tx, key, data[key])
+    for key, value in data.model_dump(exclude_unset=True).items():
+        if value is not None:
+            setattr(tx, key, value)
     return {"message": "Transaction updated"}
 
 

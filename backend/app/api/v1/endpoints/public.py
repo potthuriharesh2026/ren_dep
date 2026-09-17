@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
+from app.api.deps import get_db
 from app.models.seed import Seed
 from app.models.user import User
 
-router = APIRouter(prefix="/api/public", tags=["public"])
+router = APIRouter(prefix="/public", tags=["public"])
 
 
 @router.get("/stats")

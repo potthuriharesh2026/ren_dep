@@ -28,3 +28,5 @@ from app.schemas.market import MarketRateResponse, CreateMarketRateRequest, Upda
 from app.schemas.transaction import TransactionResponse, CreateTransactionRequest, UpdateTransactionRequest
 from app.schemas.visit import FarmVisitResponse, ScheduleVisitRequest, UpdateVisitRequest
 from app.schemas.notification import NotificationResponse
+from app.schemas.bank import BankChangeRequestInput, ReviewBankRequestInput
+

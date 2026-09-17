@@ -1,13 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth import require_role
-from app.database import get_db
+from app.api.deps import get_db, require_role
 from app.models.user import User
 from app.schemas.user import UpdateFarmerProfileRequest
+from app.schemas.bank import BankChangeRequestInput
+from app.schemas.crop import RegisterCropRequest
+from app.schemas.seed import PurchaseSeedRequest
+from app.schemas.grain import SubmitGrainSaleRequest
+from app.schemas.booking import CreateBookingRequest
 from app.services import farmer_service
 
-router = APIRouter(prefix="/api/farmer", tags=["farmer"])
+router = APIRouter(prefix="/farmer", tags=["farmer"])
 
 
 @router.get("/profile")
@@ -22,9 +26,9 @@ async def update_profile(data: UpdateFarmerProfileRequest, user: User = Depends(
 
 
 @router.post("/bank-change")
-async def request_bank_change(data: dict, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
+async def request_bank_change(data: BankChangeRequestInput, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
     try:
-        bcr_id = await farmer_service.request_bank_change(db, user.id, data.get("bank_name"), data.get("account_number"), data.get("ifsc_code"), data.get("upi_id"))
+        bcr_id = await farmer_service.request_bank_change(db, user.id, data.bank_name, data.account_number, data.ifsc_code, data.upi_id)
         return {"message": "Bank change request submitted for admin approval", "id": bcr_id}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -41,12 +45,12 @@ async def get_crops(user: User = Depends(require_role(["farmer"])), db: AsyncSes
 
 
 @router.post("/crops")
-async def register_crop(data: dict, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
-    crop_type = data.get("crop_type") or data.get("crop_name") or "General Crop"
-    acres = data.get("acres") or data.get("acreage") or 1.0
-    sowing_date = data.get("sowing_date") or data.get("planting_date")
-    harvest_date = data.get("harvest_date") or data.get("expected_harvest_date")
-    notes = data.get("notes") or (f"Seed: {data.get('seed_name')}" if data.get("seed_name") else None)
+async def register_crop(data: RegisterCropRequest, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
+    crop_type = data.crop_type or data.crop_name or "General Crop"
+    acres = data.acres or data.acreage or 1.0
+    sowing_date = data.sowing_date or data.planting_date
+    harvest_date = data.harvest_date or data.expected_harvest_date
+    notes = data.notes or (f"Seed: {data.seed_name}" if data.seed_name else None)
     
     crop_id = await farmer_service.register_crop(
         db, user.id, crop_type=crop_type, acres=float(acres),
@@ -61,22 +65,22 @@ async def get_seeds(user: User = Depends(require_role(["farmer"])), db: AsyncSes
 
 
 @router.post("/seeds/purchase")
-async def purchase_seeds(data: dict, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
+async def purchase_seeds(data: PurchaseSeedRequest, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
     try:
-        seed_id = data.get("seed_id")
-        seed_name = data.get("seed_name") or data.get("name")
-        quantity = data.get("quantity_kg") or data.get("quantity") or data.get("qty") or 1.0
+        seed_id = data.seed_id
+        seed_name = data.seed_name or data.name
+        quantity = data.quantity_kg or data.quantity or data.qty or 1.0
         
         return await farmer_service.purchase_seeds(
             db,
             farmer_id=user.id,
             seed_id=seed_id,
             quantity_kg=float(quantity),
-            payment_method=data.get("payment_method"),
-            upi_id=data.get("upi_id"),
-            transaction_id=data.get("transaction_id"),
-            warehouse_id=data.get("warehouse_id"),
-            pickup_date=data.get("pickup_date"),
+            payment_method=data.payment_method,
+            upi_id=data.upi_id,
+            transaction_id=data.transaction_id,
+            warehouse_id=data.warehouse_id,
+            pickup_date=data.pickup_date,
             seed_name=seed_name,
         )
     except ValueError as e:
@@ -89,10 +93,10 @@ async def get_seed_purchases(user: User = Depends(require_role(["farmer"])), db:
 
 
 @router.post("/grain-sales")
-async def submit_grain_sale(data: dict, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
-    grain_type = data.get("grain_type") or data.get("crop_type") or data.get("grain_name") or "Paddy"
-    quantity = data.get("quantity_kg") or data.get("quantity") or data.get("raw_material_kg") or 100.0
-    warehouse_id = data.get("warehouse_id") or 1
+async def submit_grain_sale(data: SubmitGrainSaleRequest, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
+    grain_type = data.grain_type or data.crop_type or data.grain_name or "Paddy"
+    quantity = data.quantity_kg or data.quantity or data.raw_material_kg or 100.0
+    warehouse_id = data.warehouse_id or 1
     
     sale_id = await farmer_service.submit_grain_sale(
         db, user.id, grain_type=grain_type, quantity_kg=float(quantity), warehouse_id=int(warehouse_id)
@@ -116,12 +120,12 @@ async def get_warehouse_slots(warehouse_id: int, date: str, user: User = Depends
 
 
 @router.post("/bookings")
-async def book_delivery_slot(data: dict, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
+async def book_delivery_slot(data: CreateBookingRequest, user: User = Depends(require_role(["farmer"])), db: AsyncSession = Depends(get_db)):
     try:
         slot_id = await farmer_service.book_delivery_slot(
-            db, user.id, data.get("booking_date"), data.get("delivery_address", "TBD"),
-            data.get("grain_type"), data.get("warehouse_id"), data.get("quantity_kg", 0),
-            data.get("warehouse_slot_id"),
+            db, user.id, data.booking_date, data.delivery_address or "TBD",
+            data.grain_type, data.warehouse_id, data.quantity_kg or 0,
+            data.warehouse_slot_id,
         )
         return {"id": slot_id, "message": "Booking slot created. Awaiting confirmation."}
     except ValueError as e:

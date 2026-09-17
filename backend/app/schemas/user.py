@@ -89,3 +89,8 @@ class UpdateFarmerProfileRequest(BaseModel):
     account_number: str | None = None
     ifsc_code: str | None = None
     upi_id: str | None = None
+
+
+class ApproveFarmerRequest(BaseModel):
+    status: str | None = "active"
+    notes: str | None = None

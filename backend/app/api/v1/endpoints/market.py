@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth import require_role
-from app.database import get_db
+from app.api.deps import get_db, require_role
 from app.models.market import MarketRate
 from app.models.user import User
 
-router = APIRouter(prefix="/api/market", tags=["market"])
+from app.schemas.market import CreateMarketRateRequest, UpdateMarketRateRequest
+
+router = APIRouter(prefix="/market", tags=["market"])
 
 
 @router.get("/")
@@ -17,10 +18,10 @@ async def get_rates(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/")
-async def set_rate(data: dict, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
+async def set_rate(data: CreateMarketRateRequest, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
     rate = MarketRate(
-        crop_type=data.get("crop_type"), grade=data.get("grade"),
-        price_per_kg=data.get("price_per_kg", 0), effective_date=data.get("effective_date"),
+        crop_type=data.crop_type, grade=data.grade,
+        price_per_kg=data.price_per_kg or 0, effective_date=data.effective_date,
         set_by=user.id,
     )
     db.add(rate)
@@ -29,14 +30,14 @@ async def set_rate(data: dict, user: User = Depends(require_role(["admin", "supe
 
 
 @router.put("/{rate_id}")
-async def update_rate(rate_id: int, data: dict, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
+async def update_rate(rate_id: int, data: UpdateMarketRateRequest, user: User = Depends(require_role(["admin", "super_admin"])), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(MarketRate).where(MarketRate.id == rate_id))
     rate = result.scalar_one_or_none()
     if not rate:
         raise HTTPException(status_code=404, detail="Rate not found")
-    for key in ("crop_type", "grade", "price_per_kg", "effective_date"):
-        if key in data and data[key] is not None:
-            setattr(rate, key, data[key])
+    for key, value in data.model_dump(exclude_unset=True).items():
+        if value is not None:
+            setattr(rate, key, value)
     return {"message": "Rate updated"}
 
 
