@@ -49,9 +49,9 @@ export function DashboardLayout({ children, allowedRoles }: DashboardLayoutProps
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col">
       <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-[calc(100vh-4rem)]">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="flex-1 overflow-y-auto bg-[#f8fafc] p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 min-w-0 bg-[#f8fafc] p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>

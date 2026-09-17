@@ -1,52 +1,27 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   Sprout,
-  Shield,
-  Warehouse,
   Lock,
   Phone,
   ArrowRight,
   Loader2,
-  Sparkles,
 } from "lucide-react";
 
 function LoginForm() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, demoLogin } = useAuth();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const roleParam = searchParams.get("role");
-    if (roleParam === "admin") {
-      setIdentifier("admin@agriflow.local");
-      setPassword("AdminPassword123!");
-    } else if (roleParam === "manager") {
-      setIdentifier("manager@agriflow.local");
-      setPassword("ManagerPassword123!");
-    } else if (roleParam === "farmer") {
-      setIdentifier("farmer@agriflow.local");
-      setPassword("FarmerPassword123!");
-    }
-  }, [searchParams]);
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier || !password) return;
     setLoading(true);
     await login(identifier, password);
-    setLoading(false);
-  };
-
-  const handleQuickDemo = async (role: "admin" | "manager" | "farmer") => {
-    setLoading(true);
-    await demoLogin(role);
     setLoading(false);
   };
 
@@ -63,46 +38,7 @@ function LoginForm() {
           </span>
         </Link>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome Back</h1>
-        <p className="text-xs text-slate-600 mt-1">Sign in to access your portal</p>
-      </div>
-
-      {/* 1-Click Fast Demo Login Buttons */}
-      <div className="glass-card p-4 rounded-2xl mb-6 border border-emerald-500/30 shadow-lg">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-emerald-300" />
-          <span className="text-xs font-bold text-emerald-200 uppercase tracking-wider">
-            1-Click Instant Demo Access
-          </span>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => handleQuickDemo("admin")}
-            className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-teal-400/40 bg-teal-500/20 hover:bg-teal-500/30 text-teal-100 transition-colors"
-          >
-            <Shield className="w-4 h-4 text-teal-300 mb-1" />
-            <span className="text-[11px] font-bold">Admin</span>
-          </button>
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => handleQuickDemo("manager")}
-            className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-amber-400/40 bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 transition-colors"
-          >
-            <Warehouse className="w-4 h-4 text-amber-300 mb-1" />
-            <span className="text-[11px] font-bold">Manager</span>
-          </button>
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => handleQuickDemo("farmer")}
-            className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-emerald-400/40 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-100 transition-colors"
-          >
-            <Sprout className="w-4 h-4 text-emerald-300 mb-1" />
-            <span className="text-[11px] font-bold">Farmer</span>
-          </button>
-        </div>
+        <p className="text-xs text-slate-600 mt-1">Sign in with your registered credentials to access your portal</p>
       </div>
 
       {/* Login Form Box */}

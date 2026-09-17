@@ -88,7 +88,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar Aside */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 flex-col border-r border-white/[0.08] bg-[#0c120e] px-4 py-6 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex shrink-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 flex-col border-r border-white/[0.08] bg-[#0c120e] px-4 py-6 transition-transform duration-300 ease-in-out lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:overflow-y-auto flex shrink-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

@@ -60,17 +60,17 @@ export default function ManagerDashboard() {
     <DashboardLayout allowedRoles={["manager", "admin", "super_admin"]}>
       <div className="space-y-8">
         {/* Welcome Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/50 via-slate-900 to-slate-900 border border-amber-500/20 p-6 sm:p-8">
+        <div className="executive-banner relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/70 via-slate-900 to-slate-900 border border-amber-500/30 p-6 sm:p-8 shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-3">
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                 Warehouse & Operations Hub
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Manager Operations: {user?.name}
+                Manager Operations: {user?.name || "Manager"}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+              <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-xl font-medium">
                 Real-time quality inspection, moisture deduction, warehouse inventory, and farmer approvals
               </p>
             </div>

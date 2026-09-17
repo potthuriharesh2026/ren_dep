@@ -97,17 +97,8 @@ h1, h2, h3, h4, h5, h6 {
   background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.06) 45%, rgba(248, 250, 252, 0) 80%);
 }
 
-/* High-Contrast Readability Rules */
-/* Page headers outside of cards on white canvas */
-main h1 {
-  color: #092c1c;
-}
-main p {
-  color: #334155;
-}
-
-/* Ensure text inside dark agricultural cards stays crisp and readable */
-.glass-panel, .glass-card, .glass-card-harvest, .glass-card-irrigation, .glass-card-soil, .glass-card-sprout {
+/* Ensure text inside dark agricultural cards and executive banners stays crisp and readable */
+.glass-panel, .glass-card, .glass-card-harvest, .glass-card-irrigation, .glass-card-soil, .glass-card-sprout, .executive-banner {
   color: #ffffff;
 }
 
@@ -116,13 +107,15 @@ main p {
 .glass-card-harvest h1, .glass-card-harvest h2, .glass-card-harvest h3, .glass-card-harvest h4,
 .glass-card-irrigation h1, .glass-card-irrigation h2, .glass-card-irrigation h3, .glass-card-irrigation h4,
 .glass-card-soil h1, .glass-card-soil h2, .glass-card-soil h3, .glass-card-soil h4,
-.glass-card-sprout h1, .glass-card-sprout h2, .glass-card-sprout h3, .glass-card-sprout h4 {
+.glass-card-sprout h1, .glass-card-sprout h2, .glass-card-sprout h3, .glass-card-sprout h4,
+.executive-banner h1, .executive-banner h2, .executive-banner h3, .executive-banner h4 {
   color: #ffffff !important;
 }
 
 .glass-panel p, .glass-card p,
-.glass-card-harvest p, .glass-card-irrigation p, .glass-card-soil p, .glass-card-sprout p {
-  color: #d1fae5;
+.glass-card-harvest p, .glass-card-irrigation p, .glass-card-soil p, .glass-card-sprout p,
+.executive-banner p {
+  color: #cbd5e1 !important;
 }
 
 .glass-panel th, .glass-card th {

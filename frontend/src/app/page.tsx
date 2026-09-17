@@ -290,22 +290,22 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center z-10 mt-auto pt-36 sm:pt-48 lg:pt-60">
+          <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center z-10 mt-auto pt-28 sm:pt-40 lg:pt-48">
             {/* Top Pill Announcement */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-[#082a1a]/85 px-5 py-2 text-xs font-bold text-white mb-5 backdrop-blur-2xl shadow-xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-[#082a1a]/85 px-5 py-2 text-xs font-bold text-white mb-4 backdrop-blur-2xl shadow-xl">
               <Sparkles className="w-4 h-4 text-emerald-400 animate-spin" />
               <span>Next-Gen Agricultural Supply Chain & Farmer Procurement Platform</span>
             </div>
 
-            {/* Description Card Matching Below Card Styling */}
+            {/* Description Card */}
             <div className="glass-panel p-4 sm:p-5 rounded-3xl max-w-2xl mx-auto border border-emerald-500/30 shadow-2xl backdrop-blur-2xl bg-[#082a1a]/85 text-center">
               <p className="text-sm sm:text-base font-semibold text-white leading-relaxed">
                 Empowering farmers with certified seeds, automated weighbridge inspection, real-time MSP procurement & transparent ledger passbooks.
               </p>
             </div>
 
-            {/* CTAs - Placed further down */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            {/* CTAs */}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/login"
                 className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-400 px-8 py-4 text-sm font-extrabold text-slate-950 shadow-2xl shadow-emerald-500/30 transition-all hover:scale-105"
@@ -319,41 +319,6 @@ export default function LandingPage() {
               >
                 Farmer Registration
               </Link>
-            </div>
-
-            {/* 1-Click Fast Role Portal Switcher Box */}
-            <div className="mt-8 glass-panel p-4 sm:p-5 rounded-3xl max-w-2xl mx-auto border border-emerald-500/30 shadow-2xl backdrop-blur-2xl bg-[#082a1a]/85">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-left">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wider">
-                    <Zap className="w-3.5 h-3.5 text-amber-400" /> 1-Click Test Personas
-                  </div>
-                  <p className="text-xs text-slate-300 mt-0.5">Explore each dedicated dashboard instantly</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/login?role=admin"
-                    className="px-3.5 py-2 text-xs font-bold rounded-xl bg-teal-600 hover:bg-teal-500 text-white border border-teal-400/40 hover:scale-105 transition-all flex items-center gap-1.5 shadow-sm"
-                  >
-                    <Shield className="w-3.5 h-3.5 text-white" />
-                    Admin
-                  </Link>
-                  <Link
-                    href="/login?role=manager"
-                    className="px-3.5 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white border border-amber-400/40 hover:scale-105 transition-all flex items-center gap-1.5 shadow-sm"
-                  >
-                    <Warehouse className="w-3.5 h-3.5 text-white" />
-                    Manager
-                  </Link>
-                  <Link
-                    href="/login?role=farmer"
-                    className="px-3.5 py-2 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40 hover:scale-105 transition-all flex items-center gap-1.5 shadow-sm"
-                  >
-                    <Sprout className="w-3.5 h-3.5 text-white" />
-                    Farmer
-                  </Link>
-                </div>
-              </div>
             </div>
           </div>
         </section>

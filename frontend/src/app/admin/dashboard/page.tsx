@@ -51,17 +51,17 @@ export default function AdminDashboard() {
     <DashboardLayout allowedRoles={["admin", "super_admin"]}>
       <div className="space-y-8">
         {/* Executive Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 border border-white/10 p-6 sm:p-8 shadow-2xl">
+        <div className="executive-banner relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0d3b26] via-[#082618] to-slate-900 border border-emerald-500/30 p-6 sm:p-8 shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.08] border border-white/15 text-white text-xs font-semibold mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-3">
                 <Shield className="w-3.5 h-3.5 text-emerald-400" />
                 AgriFlow Executive Command Center
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                System Overview: {user?.name || "Administrator"}
+                System Overview: {user?.name || "Super Admin"}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+              <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-xl font-medium">
                 Real-time monitoring of regional warehouses, seed logistics, procurement pipelines, and ledger balance.
               </p>
             </div>

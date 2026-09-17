@@ -58,19 +58,19 @@ export default function FarmerDashboard() {
     <DashboardLayout allowedRoles={["farmer"]}>
       <div className="space-y-8">
         {/* Welcome Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900/40 via-slate-900 to-slate-900 border border-emerald-500/20 p-6 sm:p-8">
+        <div className="executive-banner relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900/60 via-slate-900 to-slate-900 border border-emerald-500/30 p-6 sm:p-8 shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 Farmer Portal • {profile?.address || "Active Farm"}
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Welcome back, {user?.name || "Farmer"}!
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+              <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-xl font-medium">
                 Land area: <strong className="text-emerald-400">{profile?.acres_of_land ?? 5.0} Acres</strong> • Plot:{" "}
-                <span className="text-slate-300">{profile?.crop_address || "Registered Plot"}</span>
+                <span className="text-slate-200">{profile?.crop_address || "Registered Plot"}</span>
               </p>
             </div>
 
