@@ -10,16 +10,14 @@ from app.config import settings
 
 
 async def authenticate_user(db: AsyncSession, data: LoginRequest) -> tuple[User, str]:
-    identifier = data.phone or data.email
-    if not identifier:
+    raw_ident = (data.phone_or_email or data.email or data.phone or "").strip()
+    if not raw_ident:
         raise ValueError("Phone or email is required")
 
-    query = select(User)
-    if data.phone:
-        clean_phone = data.phone.replace("+91", "")
-        query = query.where(User.phone == clean_phone)
-    else:
-        query = query.where(User.email == data.email)
+    clean_phone = raw_ident.replace("+91", "").replace("-", "").replace(" ", "")
+    query = select(User).where(
+        (User.email.ilike(raw_ident)) | (User.phone == clean_phone) | (User.phone == raw_ident)
+    )
 
     result = await db.execute(query)
     user = result.scalar_one_or_none()

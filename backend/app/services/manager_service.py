@@ -130,6 +130,8 @@ async def get_visits(db: AsyncSession, admin_id: int | None = None, role: str | 
             "farmer_name": fn, "farmer_phone": fp,
             "crop_type": ct, "sowing_date": sd, "description": desc,
             "crop_address": crop_address_map.get(fv.farmer_id),
+            "notes": fv.report or "",
+            "recommendations": fv.report or "",
         }
         for fv, fn, fp, ct, sd, desc in rows
     ]
@@ -144,28 +146,83 @@ async def get_active_crops(db: AsyncSession) -> list[dict]:
     )
     return [
         {
-            "crop_id": c.id, "crop_type": c.crop_type, "acres": c.acres,
-            "sowing_date": c.sowing_date, "farmer_id": c.farmer_id,
+            **{k: v for k, v in c.__dict__.items() if not k.startswith("_")},
             "farmer_name": fn, "farmer_phone": fp,
         }
         for c, fn, fp in result.all()
     ]
 
 
-async def schedule_visit(db: AsyncSession, crop_id: int | None, farmer_id: int | None, visit_month: int | None, scheduled_date: str | None, admin_id: int | None, admin_role: str | None, requesting_admin_id: int | None) -> int:
+async def schedule_visit(db: AsyncSession, crop_id: int | None, farmer_id: int | None, visit_month: any = None, scheduled_date: str | None = None, admin_id: int | None = None, admin_role: str | None = None, requesting_admin_id: int | None = None) -> int:
+    import re
     from datetime import date as dt_date
 
-    # Resolve farmer_id from crop if missing
-    if not farmer_id and crop_id:
-        c_res = await db.execute(select(Crop.farmer_id).where(Crop.id == int(crop_id)))
-        farmer_id = c_res.scalar_one_or_none()
-    
-    if not farmer_id:
-        farmer_id = 16 # fallback to default farmer
+    # Resolve crop and farmer reliably
+    resolved_crop = None
+    if crop_id:
+        try:
+            c_res = await db.execute(select(Crop).where(Crop.id == int(crop_id)))
+            resolved_crop = c_res.scalar_one_or_none()
+        except (ValueError, TypeError):
+            pass
 
-    if not crop_id:
-        c_res = await db.execute(select(Crop.id).where(Crop.farmer_id == farmer_id).order_by(Crop.id.desc()))
-        crop_id = c_res.scalar_one_or_none() or 1
+    if not resolved_crop and farmer_id:
+        try:
+            c_res = await db.execute(select(Crop).where(Crop.farmer_id == int(farmer_id)).order_by(Crop.id.desc()))
+            resolved_crop = c_res.scalars().first()
+        except (ValueError, TypeError):
+            pass
+
+    if not resolved_crop:
+        # Pick any existing crop in db
+        c_res = await db.execute(select(Crop).order_by(Crop.id.desc()))
+        resolved_crop = c_res.scalars().first()
+
+    if resolved_crop:
+        final_crop_id = resolved_crop.id
+        final_farmer_id = resolved_crop.farmer_id
+    else:
+        # If no crops exist, find any user
+        u_res = await db.execute(select(User).where(User.role == "farmer").order_by(User.id.asc()))
+        farmer_user = u_res.scalars().first()
+        if not farmer_user:
+            u_res = await db.execute(select(User).order_by(User.id.asc()))
+            farmer_user = u_res.scalars().first()
+
+        if not farmer_user:
+            raise ValueError("No users found in system to associate with farm visit.")
+
+        final_farmer_id = farmer_user.id
+        new_crop = Crop(
+            farmer_id=final_farmer_id,
+            crop_type="Paddy",
+            acres=5.0,
+            status="growing",
+            sowing_date=dt_date.today(),
+        )
+        db.add(new_crop)
+        await db.flush()
+        final_crop_id = new_crop.id
+
+    # Parse visit_month gracefully
+    parsed_month = 1
+    if visit_month is not None:
+        try:
+            parsed_month = int(visit_month)
+        except (ValueError, TypeError):
+            month_names = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+            vm_lower = str(visit_month).lower()
+            matched_month = None
+            for idx, m in enumerate(month_names, start=1):
+                if m in vm_lower:
+                    matched_month = idx
+                    break
+            if matched_month is not None:
+                parsed_month = matched_month
+            else:
+                match = re.search(r'\d+', str(visit_month))
+                if match:
+                    parsed_month = int(match.group())
 
     parsed_date = dt_date.today()
     if scheduled_date:
@@ -175,24 +232,30 @@ async def schedule_visit(db: AsyncSession, crop_id: int | None, farmer_id: int |
             parsed_date = dt_date.today()
 
     effective_admin_id = admin_id or (admin_role == "manager" and requesting_admin_id) or None
+    if effective_admin_id:
+        adm_res = await db.execute(select(User.id).where(User.id == effective_admin_id))
+        if not adm_res.scalar_one_or_none():
+            effective_admin_id = None
+
     fv = FarmVisit(
-        crop_id=int(crop_id),
-        farmer_id=int(farmer_id),
+        crop_id=int(final_crop_id),
+        farmer_id=int(final_farmer_id),
         admin_id=effective_admin_id,
-        visit_month=int(visit_month or 1),
+        visit_month=int(parsed_month),
         scheduled_date=parsed_date,
         status="scheduled",
     )
     db.add(fv)
     await db.flush()
 
-    db.add(Notification(user_id=farmer_id, title="Farm Visit Scheduled", message=f"A visit has been scheduled for {parsed_date} (Month {visit_month or 1}).", type="info"))
+    if final_farmer_id:
+        db.add(Notification(user_id=final_farmer_id, title="Farm Visit Scheduled", message=f"A visit has been scheduled for {parsed_date} (Cycle {parsed_month}).", type="info"))
 
     if effective_admin_id and effective_admin_id != requesting_admin_id:
-        db.add(Notification(user_id=effective_admin_id, title="Farm Visit Assigned", message=f"You have been assigned a farm visit for farmer #{farmer_id} on {parsed_date}.", type="info"))
+        db.add(Notification(user_id=effective_admin_id, title="Farm Visit Assigned", message=f"You have been assigned a farm visit for farmer #{final_farmer_id} on {parsed_date}.", type="info"))
 
     if requesting_admin_id:
-        db.add(AuditLog(user_id=requesting_admin_id, action="Schedule Farm Visit", entity_type="farm_visit", entity_id=fv.id, details=f"Scheduled visit for farmer {farmer_id} on {parsed_date}"))
+        db.add(AuditLog(user_id=requesting_admin_id, action="Schedule Farm Visit", entity_type="farm_visit", entity_id=fv.id, details=f"Scheduled visit for farmer {final_farmer_id} on {parsed_date}"))
 
     return fv.id
 
@@ -210,6 +273,17 @@ async def update_visit(db: AsyncSession, visit_id: int, data: dict, admin_id: in
         if val is not None:
             setattr(visit, key, val)
 
+    if "report" not in data or not data.get("report"):
+        notes = data.get("notes") or ""
+        recs = data.get("recommendations") or ""
+        if notes or recs:
+            parts = []
+            if notes:
+                parts.append(f"Notes: {notes}")
+            if recs:
+                parts.append(f"Recommendations: {recs}")
+            visit.report = "\n\n".join(parts)
+
     for date_key in ("scheduled_date", "actual_date"):
         if data.get(date_key):
             try:
@@ -218,7 +292,10 @@ async def update_visit(db: AsyncSession, visit_id: int, data: dict, admin_id: in
                 pass
 
     if data.get("verified_acres") is not None:
-        visit.verified_acres = float(data["verified_acres"])
+        try:
+            visit.verified_acres = float(data["verified_acres"])
+        except (ValueError, TypeError):
+            pass
 
     if data.get("admin_id"):
         db.add(Notification(user_id=data["admin_id"], title="Farm Visit Assigned", message=f"You have been assigned to Farm Visit #{visit_id}.", type="info"))

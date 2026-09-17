@@ -467,7 +467,12 @@ async def get_visits(db: AsyncSession, farmer_id: int) -> list[dict]:
         .order_by(FarmVisit.created_at.desc())
     )
     return [
-        {**{k: v for k, v in fv.__dict__.items() if not k.startswith("_")}, "crop_type": ct}
+        {
+            **{k: v for k, v in fv.__dict__.items() if not k.startswith("_")},
+            "crop_type": ct,
+            "notes": fv.report or "",
+            "recommendations": fv.report or "",
+        }
         for fv, ct in result.all()
     ]
 
